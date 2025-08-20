@@ -37,7 +37,30 @@ air_df.describe().round(2)
 
 # Check unique categories for AQI
 print("AQI Categories:")
-air_df['aqi_category'].value_counts()
+print(air_df['aqi_category'].value_counts())
+
+# Create dominant_pollutant column based on highest pollutant AQI values
+pollutants = {
+    'CO': 'co_aqi_value\t',  # Note: there appears to be a tab character in this column name
+    'Ozone': 'ozone_aqi_value',
+    'NO2': 'no2_aqi_value',
+    'PM2.5': 'pm2.5_aqi_value'
+}
+
+# Function to find the dominant pollutant for each row
+def get_dominant_pollutant(row):
+    max_val = -1
+    dominant = 'Unknown'
+    for pollutant, column in pollutants.items():
+        if pd.notna(row[column]) and row[column] > max_val:
+            max_val = row[column]
+            dominant = pollutant
+    return dominant
+
+# Apply the function to create the dominant_pollutant column
+air_df['dominant_pollutant'] = air_df.apply(get_dominant_pollutant, axis=1)
+print("\nDominant Pollutant Distribution:")
+print(air_df['dominant_pollutant'].value_counts())
 
 
 # Step 3: Data Visualization
